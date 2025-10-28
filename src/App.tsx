@@ -21,6 +21,7 @@ export const App: React.FC = () => {
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
   const [needsRefocus, setNeedsRefocus] = useState(false);
   const focusedInput = useRef<HTMLInputElement>(null);
+  const timeOutRef = useRef<NodeJS.Timeout>();
 
   const AllFilters: Record<FiltersEnum, (td: Todo) => boolean> = useMemo(() => {
     return {
@@ -29,6 +30,14 @@ export const App: React.FC = () => {
       [FiltersEnum.Completed]: td => td.completed,
     };
   }, []);
+
+  const refreshTimer = () => {
+    if (timeOutRef.current) {
+      clearTimeout(timeOutRef.current);
+    }
+
+    timeOutRef.current = setTimeout(() => setErrorMessage(''), 3000);
+  };
 
   const handleAddTodoRequest = (payload: Omit<Todo, 'id'>) => {
     todoService
@@ -39,7 +48,8 @@ export const App: React.FC = () => {
       })
       .catch(error => {
         setErrorMessage('Unable to add a todo');
-        setTimeout(() => setErrorMessage(''), 3000);
+
+        refreshTimer();
         throw error;
       })
       .finally(() => {
@@ -57,7 +67,7 @@ export const App: React.FC = () => {
       })
       .catch(error => {
         setErrorMessage('Unable to delete a todo');
-        setTimeout(() => setErrorMessage(''), 3000);
+        refreshTimer();
         throw error;
       })
       .finally(() => {
@@ -77,7 +87,7 @@ export const App: React.FC = () => {
 
     if (!normalizedTitle.length) {
       setErrorMessage('Title should not be empty');
-      setTimeout(() => setErrorMessage(''), 3000);
+      refreshTimer();
       setNeedsRefocus(true);
 
       return;
@@ -105,7 +115,7 @@ export const App: React.FC = () => {
 
     if (!completedTodo.length) {
       setErrorMessage('Unable to clear completed todos');
-      setTimeout(() => setErrorMessage(''), 3000);
+      refreshTimer();
       setNeedsRefocus(true);
 
       return;
@@ -139,7 +149,7 @@ export const App: React.FC = () => {
       .then(setTodos)
       .catch(error => {
         setErrorMessage('Unable to load todos');
-        setTimeout(() => setErrorMessage(''), 3000);
+        refreshTimer();
         throw error;
       });
   }, []);
