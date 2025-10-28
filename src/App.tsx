@@ -8,6 +8,7 @@ import { TodoFilter } from './components/TodoFilter/TodoFilter';
 import { ErrorNotification } from './components/ErrorNotification';
 import * as todoService from './api/todos';
 import { FiltersEnum } from './types/enums/FiltersEnum';
+// comment to restart pipeline
 
 export const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
